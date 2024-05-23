@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Image/BillboardUp.png</file>
+        <file>Image/soilBackground.png</file>
+        <file>Image/TextBillboardUp.png</file>
+        <file>Markdown/About.md</file>
+    </qresource>
+</RCC>
