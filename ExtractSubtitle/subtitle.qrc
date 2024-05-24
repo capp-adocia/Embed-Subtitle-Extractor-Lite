@@ -4,5 +4,8 @@
         <file>Image/soilBackground.png</file>
         <file>Image/TextBillboardUp.png</file>
         <file>Markdown/About.md</file>
+        <file>Image/rockBackground.png</file>
+        <file>Image/videoBackground.png</file>
+        <file>Image/Billboard.png</file>
     </qresource>
 </RCC>

@@ -1,7 +1,12 @@
 #pragma once
 
-#include <QWidget>
-#include "ui_operationwindow.h"
+#include <QtWidgets/qwidget.h>
+#include <x64/Debug/uic/ui_OperationWindow.h>
+#include <qmessagebox.h>
+#include <fstream>
+#include <QFileInfo>
+#include <QDir>
+#include <qdebug.h>
 
 class OperationWindow : public QWidget
 {
@@ -10,7 +15,10 @@ class OperationWindow : public QWidget
 public:
 	OperationWindow(QWidget *parent = nullptr);
 	~OperationWindow();
+	void ReceiveFilePath(const QString& VideoFilePath);
+	void ReceiveSubtitle(const QString& Subtitle);
 
 private:
 	Ui::OperationWindowClass ui;
+	QString VideoFilePath;
 };

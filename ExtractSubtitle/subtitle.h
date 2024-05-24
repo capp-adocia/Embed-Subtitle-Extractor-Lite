@@ -1,25 +1,24 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include <ui_subtitle.h>
+#include <x64/Debug/uic/ui_subtitle.h>
 #include <QtNetwork/qnetworkaccessmanager.h>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
-#include <QUrl>
-#include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QFile>
+#include <QtCore/qurl.h>
+#include <QtCore/qdebug.h>
+#include <QtCore/qjsondocument.h>
+#include <QtCore/qjsonobject.h>
+#include <QtCore/qjsonarray.h>
+#include <QtCore/qfile.h>
 #include <opencv2/opencv.hpp>
-#include <QPainter>
+#include <QtGui/qpainter.h>
 #include <QtWidgets\QLabel>
-#include <qtimer.h>
-#include <QDir>
-#include <QFileDialog>
-#include <QtWebSockets/QWebSocket>
-#include <QJsonArray>
-#include <QBuffer>
-#include <QMessageBox>
+#include <QtCore/qtimer.h>
+#include <QtCore/qdir.h>
+#include <QtWidgets/qfiledialog.h>
+#include <QtCore/qbuffer.h>
+#include <QtWidgets/qmessagebox.h>
 #include <chrono>
 #include <operationwindow.h>
 
@@ -36,13 +35,14 @@ public:
 	void ChooseSubtitleFrame(); // 调节ui.FrameScrollBar来选择字幕帧
 	void InitConnect(); // 初始化时需要连接的信号和槽
 signals:
+	void SendFilePath(const QString& VideoFilePath);
 	void CroppedFrameData(const QImage& croppedImage);
+	void SendSubtitle(const QString& Subtitle); // 向编辑窗口发送字幕信号
 
 public slots:
 	void StartExtractSubTitle(); // 开始提取字幕
 	void handleFrame(); // 处理帧数据
 	void SendCroppedFrameData(const QImage& croppedImage); // 发送数据帧
-	void ExportSubtitle(); // 导出字幕
 
 private:
 	Ui::SubtitleClass ui;

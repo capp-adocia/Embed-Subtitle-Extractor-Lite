@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>msvc2017_64</QtInstall>
-    <QtModules>core;gui;network;widgets</QtModules>
+    <QtModules>core;network;gui;widgets;webenginewidgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -55,9 +55,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>D:\VSProgram\ExtractSubtitle\ExtractSubtitle;D:\Qt5.14.2\5.14.2\msvc2017_64\include;D:\Opencv-4.5.4\opencv\build\include\opencv2;D:\Opencv-4.5.4\opencv\build\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\VS_Program\ExtractSubtitle\ExtractSubtitle\;D:\Opencv-4.5.4\opencv\build\include\opencv2;D:\Opencv-4.5.4\opencv\build\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Opencv-4.5.4\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>../bin</OutDir>
+    <OutDir>../bin/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>

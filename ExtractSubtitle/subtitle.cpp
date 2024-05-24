@@ -25,19 +25,24 @@ Subtitle::Subtitle(QWidget *parent)
 		"border:5px solid rgb(224, 226, 224);"
 		"}";
 
-	ui.textBrowserWidget->setStyleSheet("QWidget#textBrowserWidget{background-image:url(:/Image/BillboardUp.png);}");
 	ui.textBrowser->setStyleSheet("QWidget#textBrowser{border-image:url(:/Image/TextBillboardUp.png);}");
-	ui.centralWidget->setStyleSheet("QWidget#centralWidget{border-image:url(:/Image/BillboardUp.png);}");
-	//// 链接跳转
+	ui.centralWidget->setStyleSheet("QWidget#centralWidget{background-image:url(:/Image/Billboard.png);}");
+	ui.HandlePage->setStyleSheet("QWidget#HandlePage{border-image:url(:/Image/rockBackground.png);}");
+	ui.openVideoButton->setStyleSheet(buttonStyleSheet);
+	ui.resquestButton->setStyleSheet(buttonStyleSheet);
+	ui.stopExtractButton->setStyleSheet(buttonStyleSheet);
+	ui.subtitleExportButton->setStyleSheet(buttonStyleSheet);
+	 //链接跳转
 	ui.textBrowser->setOpenExternalLinks(true);
 	// 加载md文档
 	ui.textBrowser->setSource(QUrl::fromLocalFile(":/Markdown/About.md"));
 
 	ui.FrameScrollBar->setEnabled(false);
+	//ui.subtitleExportButton->setEnabled(false);
 	/* 视频处理页面 */
 	handleLabel = new QLabel(ui.HandlePage);
 	upperLabel = new QLabel(ui.HandlePage);
-	upperLabel->setStyleSheet("border:0;background-color:rgba(0, 180, 120, 0.6);"); // 绿色背景
+	upperLabel->setStyleSheet("border:0;background-color: rgba(154, 154, 154, 0.6);");
 	upperLabel->raise();
 
 	/* MoveAreaSlider调节upperLabel区域的y值
@@ -60,6 +65,10 @@ Subtitle::Subtitle(QWidget *parent)
 	layout->addWidget(handleLabel);
 	layout->setContentsMargins(0, 0, 0, 0);
 	ui.HandlePage->setLayout(layout);
+
+	QPixmap pixmap(":/Image/videoBackground.png");
+	QPixmap scaledPixmap = pixmap.scaled(ui.HandlePage->width(), ui.HandlePage->height(), Qt::KeepAspectRatio);
+	handleLabel->setPixmap(pixmap);
 	/* 初始化连接 */
 	InitConnect();
 
@@ -90,12 +99,14 @@ void Subtitle::InitConnect()
 	connect(ui.FrameScrollBar, &QScrollBar::valueChanged, this, &Subtitle::ChooseSubtitleFrame);
 
 	/* 打开视频文件 */
-	connect(ui.actionOpen, &QAction::triggered, [&] {
-		// 打开
-		OpenVideoFile(QFileDialog::getOpenFileName(this, QString::fromLocal8Bit("选择视频文件"), QDir::currentPath(), QString::fromLocal8Bit("视频文件 (*.mp4 *.avi)")));
-	});
 	connect(ui.openVideoButton, &QPushButton::clicked, [&] {
 		OpenVideoFile(QFileDialog::getOpenFileName(this, QString::fromLocal8Bit("选择视频文件"), QDir::currentPath(), QString::fromLocal8Bit("视频文件 (*.mp4 *.avi)")));
+	});
+
+	/* 导出字幕 */
+	connect(ui.subtitleExportButton, &QPushButton::clicked, [&] {
+		// 对字幕进行预览和编辑
+		operationWindow->show();
 	});
 	/* 停止提取字幕 */
 	connect(ui.stopExtractButton, &QPushButton::clicked, [&] {
@@ -108,13 +119,13 @@ void Subtitle::InitConnect()
 			timer->stop();
 		}
 	});
-	/* 导出字幕 */
-	connect(ui.subtitleExportButton, &QPushButton::clicked, this, &Subtitle::ExportSubtitle);
-
-
-
-	// 连接发送裁剪好的Mat
+	// 连接发送裁剪好的图像帧数据
 	connect(this, &Subtitle::CroppedFrameData, this, &Subtitle::SendCroppedFrameData);
+	// 连接ReceiveFilePath 发送视频路径信息
+	connect(this, &Subtitle::SendFilePath, operationWindow, &OperationWindow::ReceiveFilePath);
+	// 连接ReceiveSubtitle 发送字幕信息
+	connect(this, &Subtitle::SendSubtitle, operationWindow, &OperationWindow::ReceiveSubtitle);
+	
 }
 
 void Subtitle::handleFrame()
@@ -133,10 +144,14 @@ void Subtitle::handleFrame()
 		QString msg = QString::fromLocal8Bit("总耗时：") + QString::number(duration.count()) + QString::fromLocal8Bit(" 秒");
 		QMessageBox::information(this, msgTitle, msg);
 
+		ui.textBrowser->append(QString::fromLocal8Bit("\n已经为您整理好了字幕，请点击“字幕导出”\n"));
+
 		ImageSubTitleIndex = 0;
+		ui.subtitleExportButton->setEnabled(true);
 		ui.MoveAreaSlider->setEnabled(true);
 		ui.FrameScrollBar->setEnabled(true);
 		ui.resquestButton->setEnabled(true);
+		ui.openVideoButton->setEnabled(true);
 		ui.FrameScrollBar->setValue(ui.FrameScrollBar->maximum());
 		timer->stop();
 		return;
@@ -166,8 +181,9 @@ void Subtitle::handleFrame()
 void Subtitle::OpenVideoFile(const QString& VideoFilePath)
 {
 	if (!VideoFilePath.isEmpty()) {
-		// 保存当前选择的文件
+		// 发送当前的视频文件路径
 		this->VideoFilePath = VideoFilePath;
+		emit SendFilePath(VideoFilePath);
 		cap.release();
 
 		cap.open(VideoFilePath.toStdString());
@@ -190,6 +206,7 @@ void Subtitle::OpenVideoFile(const QString& VideoFilePath)
 		ui.FrameScrollBar->setRange(0, totalFrames - 1);
 		ui.FrameScrollBar->setSingleStep(15);
 		ui.FrameScrollBar->setEnabled(true);
+		ui.subtitleExportButton->setEnabled(false);
 	}
 }
 
@@ -213,17 +230,18 @@ void Subtitle::StartExtractSubTitle()
 {
 	/* 起始时间 */
 	start = std::chrono::high_resolution_clock::now();
-	ui.textBrowser->append(QString::fromLocal8Bit("*********开始提取视频字幕*********\n"));
+	ui.textBrowser->append(QString::fromLocal8Bit("\n*********开始提取视频字幕*********\n"));
 	
 	// 只有加载了视频才提取
 	if (VideoFilePath.isEmpty())
 	{
 		// 创建并显示警告框
-		QString msgTitle = QString::fromLocal8Bit("警告!");
+		QString msgTitle = QString::fromLocal8Bit("提示！");
 		QString msg = QString::fromLocal8Bit("请选择你的视频文件");
 		QMessageBox::warning(this, msgTitle, msg);
 		return;
 	}
+	ui.openVideoButton->setEnabled(false);
 	ui.resquestButton->setEnabled(false);
 	ui.MoveAreaSlider->setEnabled(false);
 	ui.FrameScrollBar->setEnabled(false);
@@ -262,16 +280,16 @@ void Subtitle::SendCroppedFrameData(const QImage& croppedImage)
 			QByteArray responseData = reply->readAll();
 			QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
 			QJsonArray jsonArray = jsonDoc.array();
-			if (jsonArray.isEmpty())
-			{
-				return;
-			}
-			++ImageSubTitleIndex;
-			ui.textBrowser->append(QString::fromLocal8Bit("第") + QString::number(ImageSubTitleIndex) + QString::fromLocal8Bit("张图片的字幕结果:"));
+			
+			if (jsonArray.isEmpty()) return;
 
+			++ImageSubTitleIndex;
+
+			ui.textBrowser->append(QString::fromLocal8Bit("第") + QString::number(ImageSubTitleIndex) + QString::fromLocal8Bit("个字幕的结果:"));
 			foreach(const QJsonValue &value, jsonArray)
 			{
-				ui.textBrowser->append("- " + value.toString());
+				ui.textBrowser->append("* " + value.toString());
+				emit SendSubtitle(value.toString());
 			}
 		}
 		else {
@@ -281,13 +299,6 @@ void Subtitle::SendCroppedFrameData(const QImage& croppedImage)
 		manager->deleteLater();
 	});
 }
-
-/* 导出字幕 */
-void Subtitle::ExportSubtitle()
-{
-
-}
-
 
 
 
