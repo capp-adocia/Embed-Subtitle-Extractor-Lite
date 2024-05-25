@@ -245,8 +245,11 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>11</pointsize>
+        <pointsize>12</pointsize>
        </font>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
       </property>
      </widget>
     </item>

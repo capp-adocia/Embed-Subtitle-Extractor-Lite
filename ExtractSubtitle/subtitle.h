@@ -22,7 +22,7 @@
 #include <chrono>
 #include <operationwindow.h>
 
-#define INTERVALTIME 350 // 每隔IntervalTime发送一帧
+#define INTERVALTIME 400 // 每隔IntervalTime发送一帧
 
 class Subtitle : public QMainWindow
 {
@@ -56,6 +56,6 @@ private:
 	cv::Mat croppedFrame; // 被裁剪的帧图像
 	QVector<QImage> CroppedFrameVector; // 一系列帧
 	std::chrono::time_point<std::chrono::high_resolution_clock> start; // 计算提取视频字幕的时间
-	int ImageSubTitleIndex; // 图片字幕索引
 	OperationWindow* operationWindow; // 用户对字幕文本操作
+	int CurrentReplies; // 记录当前发送请求的个数
 };

@@ -4,8 +4,8 @@ Subtitle::Subtitle(QWidget *parent)
 	: QMainWindow(parent)
 	, timer(new QTimer(this))
 	, currentFramePositon(0)
-	, ImageSubTitleIndex(0)
 	, operationWindow(new OperationWindow())
+    , CurrentReplies(0)
 {
 	ui.setupUi(this);
 	/* 禁用最大化 */
@@ -112,7 +112,7 @@ void Subtitle::InitConnect()
 	connect(ui.stopExtractButton, &QPushButton::clicked, [&] {
 		if (timer->isActive())
 		{
-			ImageSubTitleIndex = 0;
+			CurrentReplies = 0;
 			ui.MoveAreaSlider->setEnabled(true);
 			ui.FrameScrollBar->setEnabled(true);
 			ui.resquestButton->setEnabled(true);
@@ -136,18 +136,6 @@ void Subtitle::handleFrame()
 
 	if ((currentFramePositon + frameRate) > totalFrames)
 	{
-		// 获取结束时间点
-		auto end = std::chrono::high_resolution_clock::now();
-		// 计算执行时间
-		std::chrono::duration<double> duration = end - start;
-		QString msgTitle = QString::fromLocal8Bit("字幕提取完成!");
-		QString msg = QString::fromLocal8Bit("总耗时：") + QString::number(duration.count()) + QString::fromLocal8Bit(" 秒");
-		QMessageBox::information(this, msgTitle, msg);
-
-		ui.textBrowser->append(QString::fromLocal8Bit("\n已经为您整理好了字幕，请点击“字幕导出”\n"));
-
-		ImageSubTitleIndex = 0;
-		ui.subtitleExportButton->setEnabled(true);
 		ui.MoveAreaSlider->setEnabled(true);
 		ui.FrameScrollBar->setEnabled(true);
 		ui.resquestButton->setEnabled(true);
@@ -206,7 +194,6 @@ void Subtitle::OpenVideoFile(const QString& VideoFilePath)
 		ui.FrameScrollBar->setRange(0, totalFrames - 1);
 		ui.FrameScrollBar->setSingleStep(15);
 		ui.FrameScrollBar->setEnabled(true);
-		ui.subtitleExportButton->setEnabled(false);
 	}
 }
 
@@ -231,7 +218,7 @@ void Subtitle::StartExtractSubTitle()
 	/* 起始时间 */
 	start = std::chrono::high_resolution_clock::now();
 	ui.textBrowser->append(QString::fromLocal8Bit("\n*********开始提取视频字幕*********\n"));
-	
+	CurrentReplies = 0;
 	// 只有加载了视频才提取
 	if (VideoFilePath.isEmpty())
 	{
@@ -283,17 +270,31 @@ void Subtitle::SendCroppedFrameData(const QImage& croppedImage)
 			
 			if (jsonArray.isEmpty()) return;
 
-			++ImageSubTitleIndex;
-
-			ui.textBrowser->append(QString::fromLocal8Bit("第") + QString::number(ImageSubTitleIndex) + QString::fromLocal8Bit("个字幕的结果:"));
+			++CurrentReplies;
+			ui.textBrowser->append(QString::fromLocal8Bit("第") + QString::number(CurrentReplies) + QString::fromLocal8Bit("个字幕的结果:"));
 			foreach(const QJsonValue &value, jsonArray)
 			{
-				ui.textBrowser->append("* " + value.toString());
-				emit SendSubtitle(value.toString());
+				if (!value.toString().isEmpty())
+				{
+					ui.textBrowser->append("* " + value.toString());
+					emit SendSubtitle(value.toString());
+				}
 			}
+			// 获取结束时间点
+			auto end = std::chrono::high_resolution_clock::now();
+			// 计算执行时间
+			std::chrono::duration<double> duration = end - start;
+			QString msg = QString::fromLocal8Bit("耗时：") + QString::number(duration.count()) + QString::fromLocal8Bit(" 秒");
+			ui.textBrowser->append("* " + msg);
 		}
-		else {
-			qDebug() << "Error: " << reply->errorString();
+		else 
+		{
+			//qDebug() << "Error: " << reply->errorString();
+			if (reply->errorString() == "Connection refused")
+			{
+				ui.textBrowser->append(QString::fromLocal8Bit("* 无法检测到文字！\n* 请检查后台服务是否开启"));
+			}
+			
 		}
 		reply->deleteLater();
 		manager->deleteLater();
