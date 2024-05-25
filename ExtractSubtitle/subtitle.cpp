@@ -73,7 +73,6 @@ Subtitle::Subtitle(QWidget *parent)
 	handleLabel->setPixmap(pixmap);
 	/* 初始化连接 */
 	InitConnect();
-
 }
 
 void Subtitle::InitConnect()
@@ -157,7 +156,9 @@ void Subtitle::handleFrame()
 	// 裁剪图像
 	this->croppedFrame = frame(roi);
 	if (frame.empty()) {
-		std::cerr << "Empty frame at position " << currentFramePositon << std::endl;
+		QString msgTitle = QString::fromLocal8Bit("Error！");
+		QString msg = QString::fromLocal8Bit("Empty frame at position");
+		QMessageBox::warning(this, msgTitle, msg);
 	}
 	// 显示
 	QImage qImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_BGR888);
@@ -179,7 +180,9 @@ void Subtitle::OpenVideoFile(const QString& VideoFilePath)
 
 		cap.open(VideoFilePath.toStdString());
 		if (!cap.isOpened()) {
-			std::cerr << "Error open video file" << std::endl;
+			QString msgTitle = QString::fromLocal8Bit("Error！");
+			QString msg = QString::fromLocal8Bit("Error open video file");
+			QMessageBox::warning(this, msgTitle, msg);
 		}
 
 		cap.set(cv::CAP_PROP_POS_FRAMES, 0); // 设置视频初始位置为当前帧
@@ -187,7 +190,9 @@ void Subtitle::OpenVideoFile(const QString& VideoFilePath)
 		cap.read(frame);
 		cv::resize(frame, frame, cv::Size(ui.HandlePage->width(), ui.HandlePage->height()));
 		if (frame.empty()) {
-			std::cerr << "Empty frame at position " << 0 << std::endl;
+			QString msgTitle = QString::fromLocal8Bit("Error！");
+			QString msg = QString::fromLocal8Bit("Empty frame at position");
+			QMessageBox::warning(this, msgTitle, msg);
 		}
 		// 显示
 		QImage qImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_BGR888);
@@ -208,7 +213,9 @@ void Subtitle::ChooseSubtitleFrame()
 	cap.read(frame);
 	cv::resize(frame, frame, cv::Size(ui.HandlePage->width(), ui.HandlePage->height()));
 	if (frame.empty()) {
-		std::cerr << "Empty frame at position " << 0 << std::endl;
+		QString msgTitle = QString::fromLocal8Bit("Error！");
+		QString msg = QString::fromLocal8Bit("Empty frame at position");
+		QMessageBox::warning(this, msgTitle, msg);
 	}
 	// 显示
 	QImage qImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_BGR888);
