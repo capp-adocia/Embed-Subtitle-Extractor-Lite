@@ -16,9 +16,11 @@ public:
 	OperationWindow(QWidget *parent = nullptr);
 	~OperationWindow();
 	void ReceiveFilePath(const QString& VideoFilePath);
-	void ReceiveSubtitle(const QString& Subtitle);
+	void ReceiveSubtitle(const QStringList& SubtitleList);
+	void ReceiveEmptyText();
 
 private:
 	Ui::OperationWindowClass ui;
 	QString VideoFilePath;
+	QStringList LastTextList;
 };

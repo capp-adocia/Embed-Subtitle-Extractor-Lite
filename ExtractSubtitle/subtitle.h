@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include <x64/Debug/uic/ui_subtitle.h>
+#include <ui_subtitle.h>
 #include <QtNetwork/qnetworkaccessmanager.h>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
@@ -37,7 +37,8 @@ public:
 signals:
 	void SendFilePath(const QString& VideoFilePath);
 	void CroppedFrameData(const QImage& croppedImage);
-	void SendSubtitle(const QString& Subtitle); // 向编辑窗口发送字幕信号
+	void SendSubtitle(const QStringList& SubtitleList); // 向编辑窗口发送字幕信号
+	void SendEmptyText();
 
 public slots:
 	void StartExtractSubTitle(); // 开始提取字幕

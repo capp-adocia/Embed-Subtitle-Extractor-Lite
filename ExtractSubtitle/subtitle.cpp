@@ -10,6 +10,8 @@ Subtitle::Subtitle(QWidget *parent)
 	ui.setupUi(this);
 	/* 禁用最大化 */
 	setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
+	setWindowTitle("Embed-Subtitle-Extractor-Lite");
+	setWindowIcon(QIcon(":/icon.ico"));
 
 	QString buttonStyleSheet = "QPushButton{"
 		"color:white;"
@@ -125,7 +127,8 @@ void Subtitle::InitConnect()
 	connect(this, &Subtitle::SendFilePath, operationWindow, &OperationWindow::ReceiveFilePath);
 	// 连接ReceiveSubtitle 发送字幕信息
 	connect(this, &Subtitle::SendSubtitle, operationWindow, &OperationWindow::ReceiveSubtitle);
-	
+	// 连接ReceiveEmptyText 发送清空文本
+	connect(this, &Subtitle::SendEmptyText, operationWindow, &OperationWindow::ReceiveEmptyText);
 }
 
 void Subtitle::handleFrame()
@@ -144,7 +147,7 @@ void Subtitle::handleFrame()
 		timer->stop();
 		return;
 	}
-	currentFramePositon += (frameRate - 1);
+	currentFramePositon += (frameRate -  1);
 	cap.set(cv::CAP_PROP_POS_FRAMES, currentFramePositon); // 设置视频位置为当前帧
 	cv::Mat frame;
 	cap.read(frame);
@@ -217,8 +220,9 @@ void Subtitle::StartExtractSubTitle()
 {
 	/* 起始时间 */
 	start = std::chrono::high_resolution_clock::now();
-	ui.textBrowser->append(QString::fromLocal8Bit("\n*********开始提取视频字幕*********\n"));
+	ui.textBrowser->append("\n*********" + QString::fromLocal8Bit("<b>开始提取视频字幕</b>") + "*********\n");
 	CurrentReplies = 0;
+	emit SendEmptyText();
 	// 只有加载了视频才提取
 	if (VideoFilePath.isEmpty())
 	{
@@ -271,21 +275,23 @@ void Subtitle::SendCroppedFrameData(const QImage& croppedImage)
 			if (jsonArray.isEmpty()) return;
 
 			++CurrentReplies;
-			ui.textBrowser->append(QString::fromLocal8Bit("第") + QString::number(CurrentReplies) + QString::fromLocal8Bit("个字幕的结果:"));
+			QStringList SubtitleList;
+			ui.textBrowser->append("<b>" + QString::fromLocal8Bit("结果") + QString::number(CurrentReplies) + ":</b>");
 			foreach(const QJsonValue &value, jsonArray)
 			{
 				if (!value.toString().isEmpty())
 				{
 					ui.textBrowser->append("* " + value.toString());
-					emit SendSubtitle(value.toString());
+					SubtitleList.append(value.toString());
 				}
 			}
+			emit SendSubtitle(SubtitleList);
 			// 获取结束时间点
 			auto end = std::chrono::high_resolution_clock::now();
 			// 计算执行时间
 			std::chrono::duration<double> duration = end - start;
 			QString msg = QString::fromLocal8Bit("耗时：") + QString::number(duration.count()) + QString::fromLocal8Bit(" 秒");
-			ui.textBrowser->append("* " + msg);
+			ui.textBrowser->append("- " + msg);
 		}
 		else 
 		{
@@ -300,9 +306,6 @@ void Subtitle::SendCroppedFrameData(const QImage& croppedImage)
 		manager->deleteLater();
 	});
 }
-
-
-
 
 Subtitle::~Subtitle()
 {

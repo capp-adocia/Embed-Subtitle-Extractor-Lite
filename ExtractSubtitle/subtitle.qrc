@@ -7,5 +7,6 @@
         <file>Image/rockBackground.png</file>
         <file>Image/videoBackground.png</file>
         <file>Image/Billboard.png</file>
+        <file>icon.ico</file>
     </qresource>
 </RCC>
