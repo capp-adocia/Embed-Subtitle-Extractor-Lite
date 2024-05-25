@@ -48,10 +48,10 @@
 ### 测试样例
 > 这里使用的视频样例是在本存储库的[testVideo.mp4](ExtractSubtitle/Video)文件
 
-1. ![MP4](/Image/MP4.png)
-2. ![提取字幕](/Image/ExtractSubtitle.png)
-3. ![字幕导出](/Image/SubtitleExPort.png)
-4. ![导出字幕VS实际字幕](/Image/ExportVSActal.png)
+1. ![MP4](ExtractSubtitle/Image/MP4.png)
+2. ![提取字幕](ExtractSubtitle/Image/ExtractSubtitle.png)
+3. ![字幕导出](ExtractSubtitle/Image/SubtitleExPort.png)
+4. ![导出字幕VS实际字幕](ExtractSubtitle/Image/ExportVSActal.png)
 
 ### 联系我
 
