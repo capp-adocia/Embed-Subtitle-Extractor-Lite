@@ -25,7 +25,7 @@
   1. 下载Releases中最新的压缩包（.zip）
   2. 解压后双击exe文件即可使用
 
-- 方式二：使用本地计算机来后台服务（麻烦;CPU;GPU）
+- 方式二：使用本地计算机来后台服务
 
 > 自己想动手本地部署的也可以使用此方式
 
@@ -34,11 +34,11 @@
    1. 和前一个使用一样，在Releases下载最新的压缩包
    2. 克隆项目存储库`git clone https://github.com/capp-adocia/Embed-Subtitle-Extractor-Lite.git`
    3. 安装所需要的pip包
-      > 注意这里pip包是对Windows平台适用
+      **注意这里pip包是对Windows平台适用**
       ```
       pip install -r requirements.txt # 仅使用CPU计算
       ```
-      > 如果想使用GPU（极大提高识别速度）计算，**请不要使用以上命令**，请前往[百度paddle](https://www.paddlepaddle.org.cn/)官网进行下载相应的pip包
+      如果想使用GPU（极大提高识别速度）计算，**请不要使用以上命令**，请前往[百度paddle](https://www.paddlepaddle.org.cn/)官网进行下载相应的pip包
    4. 启动本地服务
       ```
       python OCR.py
@@ -48,7 +48,11 @@
 ### 测试样例
 > 这里使用的视频样例是在本存储库的[testVideo.mp4](ExtractSubtitle/Video)文件
 
-
+1. ![页面展示]()
+2. ![MP4]()
+3. ![提取字幕]()
+4. ![提取完成]()
+5. 实际提取字幕VS预期结果字幕![实际提取字幕]()![预期结果字幕]()
 
 ### 联系我
 
