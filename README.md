@@ -18,31 +18,42 @@
 
 ### 使用说明
 
-- 方式一：使用已经部署在云服务器上的后台服务（易上手;快速使用;CPU）
+- 方式一：使用已经部署在云服务器上的后台服务
+
+> 想快速体验使用工具的可以使用此方式
+
   1. 下载Releases中最新的压缩包（.zip）
   2. 解压后双击exe文件即可使用
 
 - 方式二：使用本地计算机来后台服务（麻烦;CPU;GPU）
 
-> 如果云服务器上的后台服务版本无法满足需要的识别精度，可以使用自定义的本地服务来提高识别精度
-> 自己想动手本地部署的也可以使用这个方式
+> 自己想动手本地部署的也可以使用此方式
+
+> 如果云服务器上的后台服务版本无法满足需要的识别精度，可以使用此方式的本地部署来提高识别精度
 
    1. 和前一个使用一样，在Releases下载最新的压缩包
-   2. 克隆项目源码（注意这里）
-     ```
-     git clone https://github.com/capp-adocia/Embed-Subtitle-Extractor-Lite.git
-     ```
+   2. 克隆项目存储库`git clone https://github.com/capp-adocia/Embed-Subtitle-Extractor-Lite.git`
    3. 安装所需要的pip包
       > 注意这里pip包是对Windows平台适用
       ```
-      pip install -r requirements.txt
+      pip install -r requirements.txt # 仅使用CPU计算
       ```
-   4. 本地运行OCR.py文件
+      > 如果想使用GPU（极大提高识别速度）计算，**请不要使用以上命令**，请前往[百度paddle](https://www.paddlepaddle.org.cn/)官网进行下载相应的pip包
+   4. 启动本地服务
       ```
       python OCR.py
       ```
-   
+   5. 成功启动后台服务后，就可以正常提取视频内嵌字幕了
 
-### 项目地址
+### 测试样例
+> 这里使用的视频样例是在本存储库的[testVideo.mp4](ExtractSubtitle/Video)文件
 
-- 
+
+
+### 联系我
+
+-  QQ: 请通过 2636427505 联系我。
+-  QQ email: 请发送邮件至 [2636427505@qq.com](https://mail.qq.com/) 联系我。
+-  Bilibili: **是Kapa呀**（有需要的可以关注(๑•́ ₃ •̀๑)ｴｰ）
+-  ......
+
